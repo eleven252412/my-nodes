@@ -10,7 +10,6 @@ def decrypt_aes_cbc(encrypted_text, key, iv):
         return None
     aes = pyaes.AESModeOfOperationCBC(key.encode('utf-8'), iv.encode('utf-8'))
     decrypted_data = b''.join(aes.decrypt(encrypted_bytes[i:i+16]) for i in range(0, len(encrypted_bytes), 16))
-    # 移除填充
     return decrypted_data[:-decrypted_data[-1]].decode('utf-8')
 
 def extract_and_format_data(decrypted_data):
@@ -49,12 +48,10 @@ def fetch_and_decrypt():
 
 def main():
     results = fetch_and_decrypt()
-    # 将结果写入 nodes.txt 文件，而不是打印
+    # 【修改点】不再进行 Base64 再次加密，而是直接写入明文，一行一个
     with open('nodes.txt', 'w', encoding='utf-8') as f:
-        # 很多转换器支持直接一行一个链接，或者base64编码整个文件
-        # 这里我们将所有链接合并，并进行base64编码，这是最标准的订阅格式
         content = '\n'.join(results)
-        f.write(base64.b64encode(content.encode('utf-8')).decode('utf-8'))
+        f.write(content)
     print("Nodes updated successfully.")
 
 if __name__ == "__main__":
